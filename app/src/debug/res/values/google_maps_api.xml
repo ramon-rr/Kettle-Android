@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=F3:C1:27:3F:48:54:70:B4:2D:24:87:A6:C4:5F:D7:A7:08:25:A8:4F%3Bcom.example.kettle
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    com.example.kettle
+
+    SHA-1 certificate fingerprint:
+    F3:C1:27:3F:48:54:70:B4:2D:24:87:A6:C4:5F:D7:A7:08:25:A8:4F
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCqRyIsM1v3htDKmqaDnDI2OfTsEFi-m-o</string>
+</resources>
