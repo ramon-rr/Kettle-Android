@@ -31,6 +31,10 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".LogInActivity"
+            android:label="LogIn"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
             android:theme="@style/AppTheme.NoActionBar"/>

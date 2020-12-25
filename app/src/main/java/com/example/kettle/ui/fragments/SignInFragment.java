@@ -12,10 +12,10 @@ import com.example.kettle.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link SingInFragment#newInstance} factory method to
+ * Use the {@link SignInFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SingInFragment extends Fragment {
+public class SignInFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class SingInFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public SingInFragment() {
+    public SignInFragment() {
         // Required empty public constructor
     }
 
@@ -36,11 +36,11 @@ public class SingInFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment SingInFragment.
+     * @return A new instance of fragment SignInFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SingInFragment newInstance(String param1, String param2) {
-        SingInFragment fragment = new SingInFragment();
+    public static SignInFragment newInstance(String param1, String param2) {
+        SignInFragment fragment = new SignInFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +61,6 @@ public class SingInFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sing_in, container, false);
+        return inflater.inflate(R.layout.fragment_sign_in, container, false);
     }
 }

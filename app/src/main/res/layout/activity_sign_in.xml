@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/view"
+    android:background="#ECECEC"
+    android:paddingTop="100dp"
+    android:paddingBottom="100dp">
+
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/kettle"
+        android:text="Welcome to"
+        android:textSize="16dp">
+    </TextView>
+    
+    <TextView
+        android:id="@+id/kettle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/welcome"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/logo"
+        android:textSize="50dp"
+        android:text="Kettle">
+    </TextView>
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:layout_constraintTop_toTopOf="@id/view"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toBottomOf="@id/view"
+        android:src="@drawable/logo">
+    </ImageView>
+
+    <EditText
+        android:id="@+id/username"
+        android:background="#ffffff"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/password"
+        android:textSize="25dp"
+        android:text="Username">
+    </EditText>
+
+    <EditText
+        android:id="@+id/password"
+        android:background="#ffffff"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@id/username"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/log_in"
+        android:inputType="textPassword"
+        android:textSize="25dp"
+        android:text="Password">
+    </EditText>
+
+    <Button
+        android:id="@+id/log_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/password"
+        app:layout_constraintLeft_toLeftOf="@id/view"
+        app:layout_constraintRight_toRightOf="@id/view"
+        app:layout_constraintBottom_toBottomOf="@id/view"
+        android:text="Log In"
+        android:textSize="20dp">
+
+    </Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
