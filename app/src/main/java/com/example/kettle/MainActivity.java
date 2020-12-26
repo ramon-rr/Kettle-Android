@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.kettle.maps.support.MapsActivity;
+
 /**
  * Kettle Main Class Entry point to Frags
  */

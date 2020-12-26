@@ -1,4 +1,4 @@
-package com.example.kettle;
+package com.example.kettle.maps.support;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.kettle.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -25,10 +26,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +42,7 @@ import java.util.List;
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
+    ArrayList<LatLng> allPoints = new ArrayList<>();
     GoogleMap mGoogleMap;
     SupportMapFragment mapFrag;
     LocationRequest mLocationRequest;
@@ -96,7 +100,37 @@ public class MapsActivity extends AppCompatActivity
             mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
             mGoogleMap.setMyLocationEnabled(true);
         }
+
+
+       /* LatLng ll= new LatLng(location.getLatitude(), location.getLongitude());
+
+                GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+                        .position(ll, 10f, 10f);
+                mGoogleMap.addGroundOverlay(newarkMap);*/
+
+
+
+       /*OnClick Listener places pins on the map and saves them to the allPoints ArrayList
+       * TODO: Needs to interact with back end to save posts to DB.
+       * */
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                allPoints.add(point);
+                GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+                        .position(point, 15f, 15f);
+                mGoogleMap.addGroundOverlay(newarkMap);
+
+                /*mGoogleMap.clear();
+                mGoogleMap.addMarker(new MarkerOptions().position(point));*/
+            }
+        });
+
     }
+
+
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
@@ -106,7 +140,11 @@ public class MapsActivity extends AppCompatActivity
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
                 Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
+
                 mLastLocation = location;
+
+
+
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
                 }
