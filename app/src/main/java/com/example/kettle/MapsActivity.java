@@ -31,6 +31,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
+/**
+ * Author: Ramon Reyes
+ * Desc: Google Maps Activity that is the entry point of User Interaction
+ * pinning, viewing profile, messaging is accessible through this class
+ */
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
