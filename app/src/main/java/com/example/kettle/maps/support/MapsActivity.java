@@ -26,6 +26,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -118,13 +119,32 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public void onMapClick(LatLng point) {
                 allPoints.add(point);
-                GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                //TODO activate post fragment, send over the location information. and call this code in the frag.
+                GroundOverlay postGroundOverlay = mGoogleMap.addGroundOverlay(new GroundOverlayOptions()
+                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+                        .position(point, 15f, 15f)
+                        .clickable(true));
+
+
+
+
+               /* GroundOverlayOptions post = new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
                         .position(point, 15f, 15f);
-                mGoogleMap.addGroundOverlay(newarkMap);
+
+                mGoogleMap.addGroundOverlay(post);*/
+
 
                 /*mGoogleMap.clear();
                 mGoogleMap.addMarker(new MarkerOptions().position(point));*/
+            }
+        });
+
+        mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
+
+            @Override
+            public void onGroundOverlayClick(GroundOverlay groundOverlay) {
+                //View post, comment, share, like.
             }
         });
 
@@ -149,15 +169,15 @@ public class MapsActivity extends AppCompatActivity
                     mCurrLocationMarker.remove();
                 }
 
-                //Place current location marker
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
+                //Place current location marker DO NOT USE EXAMPLE FOR MARKER PLACEMENT
+                /*MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-               // mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
+                mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);*/
 
                 //move map camera
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
             }
         }
