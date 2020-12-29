@@ -14,8 +14,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.kettle.R;
+import com.example.kettle.ui.fragments.PostFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -120,6 +122,10 @@ public class MapsActivity extends AppCompatActivity
             public void onMapClick(LatLng point) {
                 allPoints.add(point);
                 //TODO activate post fragment, send over the location information. and call this code in the frag.
+                PostFragment pf = new PostFragment();
+                FragmentManager fm = getSupportFragmentManager();
+                fm.beginTransaction().replace(R.id.map, pf).addToBackStack("PostFragment").commit();
+
                 GroundOverlay postGroundOverlay = mGoogleMap.addGroundOverlay(new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
                         .position(point, 15f, 15f)
