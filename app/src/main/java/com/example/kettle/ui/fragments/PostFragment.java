@@ -4,13 +4,16 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.kettle.KettleViewModel;
 import com.example.kettle.R;
 
 /**
@@ -19,7 +22,7 @@ import com.example.kettle.R;
  * create an instance of this fragment.
  */
 public class PostFragment extends Fragment {
-
+    private KettleViewModel model;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,11 +67,32 @@ public class PostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        model = new ViewModelProvider(requireActivity()).get(KettleViewModel.class);
         View view = inflater.inflate(R.layout.fragment_post, container, false);
-        EditText title = view.findViewById(R.id.titleEdit);
-        title.requestFocus();
-        InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        final EditText titleEdit = view.findViewById(R.id.titleEdit);
+        titleEdit.requestFocus();
+        final InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        final EditText bodyEdit = view.findViewById(R.id.postBody);
+
+        Button postButton = view.findViewById(R.id.postButton);
+        postButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String postTitle = titleEdit.getText().toString();
+                final String postBody = bodyEdit.getText().toString();
+
+                model.getPostTitle().setValue(postTitle);
+                model.getPostBody().setValue(postBody);
+                model.getPostCreated().setValue(true);
+                requireActivity().getSupportFragmentManager().popBackStack();
+                imgr.hideSoftInputFromWindow(
+                        requireActivity().getCurrentFocus().getWindowToken(), 0);
+
+            }
+        });
+
+
         return view;
     }
 }

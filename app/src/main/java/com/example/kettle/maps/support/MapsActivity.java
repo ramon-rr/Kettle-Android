@@ -15,7 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.example.kettle.KettleViewModel;
 import com.example.kettle.R;
 import com.example.kettle.ui.fragments.PostFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -52,6 +55,7 @@ public class MapsActivity extends AppCompatActivity
     Location mLastLocation;
     Marker mCurrLocationMarker;
     FusedLocationProviderClient mFusedLocationClient;
+    KettleViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,9 @@ public class MapsActivity extends AppCompatActivity
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
+        model = new ViewModelProvider(this).get(KettleViewModel.class);
+
+
     }
 
     @Override
@@ -87,77 +94,58 @@ public class MapsActivity extends AppCompatActivity
         mLocationRequest.setFastestInterval(120000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                //Location Permission already granted
-                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
-                mGoogleMap.setMyLocationEnabled(true);
-            } else {
-                //Request Location Permission
-                checkLocationPermission();
-            }
-        }
-        else {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
-            mGoogleMap.setMyLocationEnabled(true);
-        }
+        checkLocationPermission();
 
 
-       /* LatLng ll= new LatLng(location.getLatitude(), location.getLongitude());
-
-                GroundOverlayOptions newarkMap = new GroundOverlayOptions()
-                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
-                        .position(ll, 10f, 10f);
-                mGoogleMap.addGroundOverlay(newarkMap);*/
-
-
-
-       /*OnClick Listener places pins on the map and saves them to the allPoints ArrayList
-       * TODO: Needs to interact with back end to save posts to DB.
-       * */
+       /**OnClick Listener places pins on the map and saves them to the allPoints ArrayList
+         * TODO: Needs to interact with back end to save posts to DB.
+         *
+         * */
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 allPoints.add(point);
+
                 //TODO activate post fragment, send over the location information. and call this code in the frag.
                 PostFragment pf = new PostFragment();
                 FragmentManager fm = getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.map, pf).addToBackStack("PostFragment").commit();
-
-                GroundOverlay postGroundOverlay = mGoogleMap.addGroundOverlay(new GroundOverlayOptions()
-                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
-                        .position(point, 15f, 15f)
-                        .clickable(true));
-
-
-
-
-               /* GroundOverlayOptions post = new GroundOverlayOptions()
-                        .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
-                        .position(point, 15f, 15f);
-
-                mGoogleMap.addGroundOverlay(post);*/
-
-
-                /*mGoogleMap.clear();
-                mGoogleMap.addMarker(new MarkerOptions().position(point));*/
             }
         });
 
-        mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
-
+        final Observer<Boolean> postCreatedObserver = new Observer<Boolean>() {
+            String postTitle = "";
+            String postBody = "";
             @Override
-            public void onGroundOverlayClick(GroundOverlay groundOverlay) {
-                //View post, comment, share, like.
+            public void onChanged(Boolean created) {
+                if(created){
+                    GroundOverlay postGroundOverlay = mGoogleMap.addGroundOverlay(new GroundOverlayOptions()
+                            .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
+                            .position(allPoints.get(allPoints.size()-1), 15f, 15f)
+                            .clickable(true));
+                    postTitle = model.getPostTitle().getValue();
+                    postBody = model.getPostBody().getValue();
+                    System.out.println("*****************" + postTitle + "\n" + postBody + "\n");
+                    model.getPostCreated().setValue(false);
+                }
             }
+        };
+
+        model.getPostCreated().observe(this, postCreatedObserver);
+
+        /*mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
+
+
         });
+    */
 
     }
 
 
-
+    /**
+     * Call back for user location change. This updates the list of locations at an interval
+     * last location is the last element in the list, where the user was located.
+     */
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -168,8 +156,6 @@ public class MapsActivity extends AppCompatActivity
                 Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
 
                 mLastLocation = location;
-
-
 
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker.remove();
@@ -189,8 +175,38 @@ public class MapsActivity extends AppCompatActivity
         }
     };
 
+    /**
+     * Checks for location permissions, if it was not granted, it requests location permissions
+     * by calling requestLocationPermission()
+     */
+    private void checkLocationPermission(){
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                //Location Permission already granted
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                mGoogleMap.setMyLocationEnabled(true);
+            } else {
+                //Request Location Permission
+                requestLocationPermission();
+            }
+        }
+        else {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+            mGoogleMap.setMyLocationEnabled(true);
+        }
+    }
+
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    private void checkLocationPermission() {
+
+    /**
+     * Requests location permission by showing the user a popup which contain call backs to
+     * set permissions in the manifest according to user input. Will notify the user that the app
+     * needs permissions if the choose to deny location permissions.
+     */
+    private void requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -216,7 +232,6 @@ public class MapsActivity extends AppCompatActivity
                         .create()
                         .show();
 
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
@@ -225,6 +240,7 @@ public class MapsActivity extends AppCompatActivity
             }
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
