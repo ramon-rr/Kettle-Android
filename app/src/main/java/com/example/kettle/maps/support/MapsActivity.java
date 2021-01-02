@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kettle.KettleViewModel;
 import com.example.kettle.R;
+import com.example.kettle.networking.HttpPostRequest;
 import com.example.kettle.ui.fragments.PostFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -125,7 +126,10 @@ public class MapsActivity extends AppCompatActivity
                             .clickable(true));
                     postTitle = model.getPostTitle().getValue();
                     postBody = model.getPostBody().getValue();
-                    System.out.println("*****************" + postTitle + "\n" + postBody + "\n");
+                    HttpPostRequest postRequest = new HttpPostRequest();
+                    postRequest.execute("TestUser", postTitle, postBody);
+                    System.out.println("**" + postTitle + "\n" + postBody + "\n");
+                    //TODO Needs to talk to the Kettle server to save this data
                     model.getPostCreated().setValue(false);
                 }
             }
