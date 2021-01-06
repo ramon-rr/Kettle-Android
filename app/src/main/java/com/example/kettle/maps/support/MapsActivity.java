@@ -19,9 +19,11 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.kettle.KettleViewModel;
+import com.example.kettle.PostInfo;
 import com.example.kettle.R;
 import com.example.kettle.networking.HttpPostRequest;
 import com.example.kettle.ui.fragments.PostFragment;
+import com.example.kettle.ui.fragments.PostViewFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -106,8 +108,6 @@ public class MapsActivity extends AppCompatActivity
             @Override
             public void onMapClick(LatLng point) {
                 allPoints.add(point);
-
-                //TODO activate post fragment, send over the location information. and call this code in the frag.
                 PostFragment pf = new PostFragment();
                 FragmentManager fm = getSupportFragmentManager();
                 fm.beginTransaction().replace(R.id.map, pf).addToBackStack("PostFragment").commit();
@@ -124,12 +124,27 @@ public class MapsActivity extends AppCompatActivity
                             .image(BitmapDescriptorFactory.fromResource(R.drawable.pin))
                             .position(allPoints.get(allPoints.size()-1), 15f, 15f)
                             .clickable(true));
+
                     postTitle = model.getPostTitle().getValue();
                     postBody = model.getPostBody().getValue();
                     HttpPostRequest postRequest = new HttpPostRequest();
                     postRequest.execute("TestUser", postTitle, postBody);
-                    System.out.println("**" + postTitle + "\n" + postBody + "\n");
-                    //TODO Needs to talk to the Kettle server to save this data
+                    PostInfo pi = new PostInfo("TestUser", postTitle, postBody);
+                    postGroundOverlay.setTag(pi);
+                    mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
+                        @Override
+                        public void onGroundOverlayClick(GroundOverlay groundOverlay) {
+                            PostInfo retrievedPi = (PostInfo) groundOverlay.getTag();
+                            System.out.println("** " + retrievedPi.getUser()+ " " + retrievedPi.getTitle() +
+                                    " " + retrievedPi.getBody());
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("VIEW_POST", retrievedPi);
+                            PostViewFragment pvm = new PostViewFragment();
+                            pvm.setArguments(bundle);
+                            FragmentManager fm = getSupportFragmentManager();
+                            fm.beginTransaction().replace(R.id.map, pvm).addToBackStack("PostViewFragment").commit();
+                        }
+                    });
                     model.getPostCreated().setValue(false);
                 }
             }
@@ -137,11 +152,11 @@ public class MapsActivity extends AppCompatActivity
 
         model.getPostCreated().observe(this, postCreatedObserver);
 
-        /*mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
+        /**
+         * Sets the onClick listener to display the post information for this pin created
+         */
 
 
-        });
-    */
 
     }
 

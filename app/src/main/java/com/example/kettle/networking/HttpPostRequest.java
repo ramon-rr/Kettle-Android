@@ -1,18 +1,12 @@
 package com.example.kettle.networking;
 import android.os.AsyncTask;
-import android.util.JsonReader;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 /**
  * POST method for nodejs server to post to Kettlex in mongodb instance.
