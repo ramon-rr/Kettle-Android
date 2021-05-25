@@ -1,21 +1,15 @@
 package com.example.kettle.networking;
 import android.os.AsyncTask;
-import android.util.JsonReader;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 /**
- * POST method for nodejs server to post to leaderboard in mongodb instance. take out leaderboard code
+ * POST method for nodejs server to post to Kettlex in mongodb instance.
  */
 public class HttpPostRequest extends AsyncTask<Object, Void, Void> {
     static final String REQUEST_METHOD = "POST";
@@ -34,11 +28,12 @@ public class HttpPostRequest extends AsyncTask<Object, Void, Void> {
         JSONObject json = new JSONObject();
         try {
             json.put("User", (String) objects[0]);
-            json.put("Score", (Integer) objects[1]);
+            json.put("Title", (String) objects[1]);
+            json.put("Body", (String) objects[2]);
             URL url;
             DataOutputStream printout;
-            String address = "https://kettlex-server.herokuapp.com/operationx/post";
-            Log.d("sendPost",address);
+            String address = "https://kettlex-server.herokuapp.com/kettlex/post";
+            Log.d("sendPost", address);
             url = new URL (address);
             urlConn = (HttpURLConnection) url.openConnection();
             urlConn.setDoInput (true);

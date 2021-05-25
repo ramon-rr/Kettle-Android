@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.fragments.PostFragment"
+    android:id="@+id/make_post"
+    android:background="#CAC9C5">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/titlePrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/enter_title"
+        android:layout_margin="3dp"
+        android:textSize="30sp"/>
+    <EditText
+        android:id="@+id/titleEdit"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:background="@drawable/text_box"
+        android:hint="@string/title"
+        app:layout_constraintTop_toBottomOf="@id/titlePrompt"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+    <TextView
+        android:id="@+id/bodyPrompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/say_it_loud_and_proud"
+        android:textSize="30sp"
+        android:layout_margin="3dp"
+        app:layout_constraintTop_toBottomOf="@id/titleEdit"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+    <EditText
+        android:id="@+id/postBody"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/text_box"
+        android:hint="@string/what_are_you_thinking"
+        android:padding="5dp"
+        android:layout_margin="10dp"
+        android:gravity="top|left"
+        app:layout_constraintTop_toBottomOf="@id/bodyPrompt"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/postButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/postBody"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:background="@drawable/rounded_button"
+        android:textColor="@color/lineColor"
+        android:layout_margin="5dp"
+        android:text="POST" />
+</androidx.constraintlayout.widget.ConstraintLayout>
