@@ -1,6 +1,7 @@
-package com.example.kettle.maps.support;
+ package com.example.kettle.maps.support;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.kettle.KettleViewModel;
 import com.example.kettle.PostInfo;
 import com.example.kettle.R;
@@ -34,12 +33,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,6 @@ import java.util.List;
  */
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback {
-
     ArrayList<LatLng> allPoints = new ArrayList<>();
     GoogleMap mGoogleMap;
     SupportMapFragment mapFrag;
@@ -68,8 +66,6 @@ public class MapsActivity extends AppCompatActivity
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
         model = new ViewModelProvider(this).get(KettleViewModel.class);
-
-
     }
 
     @Override
@@ -81,10 +77,14 @@ public class MapsActivity extends AppCompatActivity
             mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         }
     }
-
+    //TODO Needs to GET all the posts in the area to be able to load them in to the map at an interval
+    // Radius calculation will be needed to find what posts to get
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+
+
+
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         //Disable scroll map fragment
@@ -93,15 +93,12 @@ public class MapsActivity extends AppCompatActivity
         mGoogleMap.getUiSettings().setZoomGesturesEnabled(false);
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(120000); // two minute interval
-        mLocationRequest.setFastestInterval(120000);
+        mLocationRequest.setInterval(12000); // two minute interval
+        mLocationRequest.setFastestInterval(12000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
         checkLocationPermission();
 
-
        /**OnClick Listener places pins on the map and saves them to the allPoints ArrayList
-         * TODO: Needs to interact with back end to save posts to DB.
          *
          * */
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -132,6 +129,10 @@ public class MapsActivity extends AppCompatActivity
                     PostInfo pi = new PostInfo("TestUser", postTitle, postBody);
                     postGroundOverlay.setTag(pi);
                     mGoogleMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener(){
+                        /**
+                         * Sets the onClick listener to display the post information for this pin created
+                         * by getting the GroundOverlay tag that was set when the post was created
+                         */
                         @Override
                         public void onGroundOverlayClick(GroundOverlay groundOverlay) {
                             PostInfo retrievedPi = (PostInfo) groundOverlay.getTag();
@@ -149,15 +150,24 @@ public class MapsActivity extends AppCompatActivity
                 }
             }
         };
-
         model.getPostCreated().observe(this, postCreatedObserver);
 
-        /**
-         * Sets the onClick listener to display the post information for this pin created
-         */
 
+        mGoogleMap.setOnCameraMoveStartedListener(new  GoogleMap.OnCameraMoveStartedListener(){
+            @Override
+            public void onCameraMoveStarted(int i) {
+                LatLngBounds bounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+                LatLng northeast = bounds.northeast;
+                LatLng southwest = bounds.southwest;
 
+                Context context = getApplicationContext();
+                CharSequence text = "ne:"+northeast+" sw:"+southwest;
+                int duration = Toast.LENGTH_SHORT;
 
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        });
     }
 
 
@@ -172,7 +182,8 @@ public class MapsActivity extends AppCompatActivity
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
-                Log.i("MapsActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
+                Log.i("MapsActivity", "Location: " + location.getLatitude() +
+                        " " + location.getLongitude());
 
                 mLastLocation = location;
 
@@ -188,8 +199,9 @@ public class MapsActivity extends AppCompatActivity
                 mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);*/
 
                 //move map camera
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+                LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                System.out.println("Camera set to user**********");
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
             }
         }
     };
@@ -199,13 +211,13 @@ public class MapsActivity extends AppCompatActivity
      * by calling requestLocationPermission()
      */
     private void checkLocationPermission(){
-
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 //Location Permission already granted
-                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback,
+                        Looper.myLooper());
                 mGoogleMap.setMyLocationEnabled(true);
             } else {
                 //Request Location Permission
@@ -213,7 +225,8 @@ public class MapsActivity extends AppCompatActivity
             }
         }
         else {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback,
+                    Looper.myLooper());
             mGoogleMap.setMyLocationEnabled(true);
         }
     }
@@ -226,8 +239,8 @@ public class MapsActivity extends AppCompatActivity
      * needs permissions if the choose to deny location permissions.
      */
     private void requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -255,7 +268,7 @@ public class MapsActivity extends AppCompatActivity
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION );
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
     }
@@ -269,7 +282,6 @@ public class MapsActivity extends AppCompatActivity
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     // permission was granted, yay! Do the
                     // location-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
